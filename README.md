@@ -2,6 +2,7 @@
 
 Official repository for the paper
 "Self-supervised enhanced denoising diffusion for anomaly detection", Information Sciences. [INS 2024](https://doi.org/10.1016/j.ins.2024.120612)
+
 "Prototype-oriented hypergraph representation learning for anomaly detection in tabular data", Information Processing and Management. [IPM 2025](https://doi.org/10.1016/j.ipm.2024.103877)
 
 This repository is not yet completed, so please check this as a reference only.
