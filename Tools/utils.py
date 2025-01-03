@@ -121,7 +121,6 @@ def getdataNN_param(dataname, rato):
     test_y = np.concatenate((normal_label[test_idx], anom_label[test_idy]))
 
     train_x, train_y = shuffle(train_x, train_y)
-    # tips 训练 waveform注释掉shuttle 效果可以
     test_x, test_y = shuffle(test_x, test_y)
 
 
@@ -159,8 +158,6 @@ def getdataNN_cofd(dataname, rato):
     train_x = normal_data[train_idx]
     train_y = normal_label[train_idx]
 
-    # train_x = np.concatenate((normal_data[train_idx], anom_data[train_idy]))
-    # train_y = np.concatenate((normal_label[train_idx], anom_label[train_idy]))
 
     test_x = np.concatenate((normal_data[test_idx], anom_data[test_idy]))
     test_y = np.concatenate((normal_label[test_idx], anom_label[test_idy]))
@@ -285,10 +282,7 @@ def train_test(data, label):
 
 
 def save_data(data,label,dataname,data_type):
-    # dataname_list = ['WPBC', 'wdbc', 'breastw', 'pima', 'cardio', 'Stamps',
-    #                  'SpamBase', 'glass', 'yeast', 'wilt',
-    #                  'landsat'
-    #                  ]
+
     result_axis0 = np.concatenate((data, label.reshape(-1, 1)), axis=1)
     save_dir = f'./datasets/generated_data/{data_type}'
     np.save(os.path.join(save_dir, f'{dataname}.npy'), result_axis0)
@@ -361,8 +355,8 @@ def getdata_dimension(dataname, rato,m):
 
     d = data.shape[1]
 
-    selected_indices = np.random.choice(d, m, replace=False)  # 随机选择m个维度索引，确保不重复
-    data = data[:, selected_indices]  # 提取对应的维度数据
+    selected_indices = np.random.choice(d, m, replace=False)
+    data = data[:, selected_indices] 
 
 
     train_x = data
@@ -491,7 +485,7 @@ def getDatas(dataname, rato, type):
     test_idy = np.random.choice(np.arange(0, len(anom_data)), int(len(anom_data) * rato), replace=False)
 
     train_idx = np.setdiff1d(np.arange(0, len(normal_data)), test_idx)
-    # tips 用作添加异常值的数据
+
     train_idy = np.setdiff1d(np.arange(0, len(anom_data)), test_idy)
 
     abnor_id1 = np.random.choice(np.arange(0, len(train_idy)), max(1, int(len(train_idx)*0.001)), replace=False)
@@ -914,27 +908,25 @@ def from_feature_kNN(args, features: torch.Tensor, k: int, device: torch.device 
         ``device`` (``torch.device``, optional): The device to store the hypergraph. Defaults to ``torch.device('cpu')``.
     """
 
-    # 边的索引
-    # dis_array, e_list = _e_list_from_feature_kNN(features.cpu(), k)
     dis_array, e_list = _e_list_from_feature_kNN11(features.cpu(), k)
     # tips MAD_distance
     if w_list and mad:
 
-        # todo 加快训练速度
+
         w_list = []
         alpha = args.alpha
-        # 将所有节点数据提前转换到 numpy 数组
+
         features_np = features.cpu().numpy()
-        # 将 e_list 转换为 numpy 数组，方便批量处理
+
         e_array = np.array(e_list)
-        # 批量提取所有节点的数据
+
         all_data = features_np[e_array]
-        # 计算中位数和 MAD
+
         medians = np.median(all_data, axis=1)
         mad_distances = np.median(np.abs(all_data - medians[:, np.newaxis, :]), axis=1)
-        # 将 MAD 转换为权重
+
         dis_nor = np.mean(np.exp(-alpha * mad_distances), axis=1)
-        # 将结果转换为列表
+
         w_list = dis_nor.tolist()
 
         hg = Hypergraph(features.shape[0], e_list, w_list, device=device)
@@ -1019,14 +1011,6 @@ def generate_realistic_synthetic(X, y, realistic_synthetic_mode, alpha: int, per
     :param alpha: the scaling parameter for controling the generated local and cluster anomalies
     :param percentage: controling the generated global anomalies
     '''
-    # if the dataset is too small, generating duplicate smaples up to n_samples_threshold
-    # if len(y) < 1000:
-    #     print(f'generating duplicate samples for dataset...')
-    #     idx_duplicate = np.random.choice(np.arange(len(y)), 1000, replace=True)
-    #     X = X[idx_duplicate]
-    #     y = y[idx_duplicate]
-
-
 
     if realistic_synthetic_mode in ['local', 'cluster', 'dependency', 'global']:
         pass
@@ -1134,8 +1118,6 @@ def tsne(data, dim):
 
 
 if __name__ == '__main__':
-    # tips kdd数据处理  goad论文
-    # url =  "../datasets/kddcup.data_10_percent (4).gz"
     urls = [
         "../datasets/kddcup.data_10_percent (4).gz",
         "http://kdd.ics.uci.edu/databases/kddcup99/kddcup.names"
@@ -1147,11 +1129,10 @@ if __name__ == '__main__':
 
     labels = np.where(df['status'] == 'normal.', 1, 0)
 
-    # 删除 df 的最后一列
+
     df.drop(columns=df.columns[-1], inplace=True)
 
     df_symbolic = df_colnames[df_colnames['f_types'].str.contains('symbolic.')]
-    # df_continuous = df_colnames[df_colnames['f_types'].str.contains('continuous.')]
     df_symbolic_names = df.columns.intersection(df_symbolic['f_names'])
     samples = pd.get_dummies(df.iloc[:, :-1], columns=df_symbolic_names)
 
