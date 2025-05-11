@@ -8,7 +8,7 @@ class AttentionPooling(nn.Module):
     def __init__(self, size):
         super(AttentionPooling, self).__init__()
         self.n = size -1
-        self.sigmoid = nn.Sigmoid()
+        self.sigmoid = nn.Softmax()
 
 
     def forward(self, outs):
