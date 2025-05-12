@@ -64,7 +64,6 @@ def double(train_x, train_y):
     # Constructing inputs to the model
     neg_x = train_x
 
-    # tips 评估分数
     # evaluate_similarity(train_x, neg_x)
 
 
