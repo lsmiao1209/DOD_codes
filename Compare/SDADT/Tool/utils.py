@@ -95,20 +95,19 @@ def Metrics(test_y, error):
 
 def draw_synthetic(label, data):
     X = data
-    # tips 1、数据降维——t-SNE
+
     pca = sklearn.decomposition.PCA(n_components=2)
     pca_result = pca.fit_transform(X)
     tsne = sklearn.manifold.TSNE(n_components=2, perplexity=30, n_iter=1000, learning_rate='auto',
                                  random_state=20150101, init=pca_result)
     X_tsne = tsne.fit_transform(X)
-    # tips 2、归一化处理
+
     x_min, x_max = X_tsne.min(0), X_tsne.max(0)
     X_all = (X_tsne - x_min) / (x_max - x_min)
 
     X_normal = X_all[label==0]
     X_abnormal = X_all[label==1]
 
-    # tips 4、绘制散点图（import matplotlib.pyplot as plt）
     plt.figure(figsize=(5, 5), dpi=300)
     plt.scatter(X_normal[:, 0], X_normal[:, 1], 30,  color='lightsteelblue')
     plt.scatter(X_abnormal[:, 0], X_abnormal[:, 1], 30, color='lightcoral')   # plt.scatter(X_abnormal[:, 0], X_abnormal[:, 1], 35, label='detect', color='none', edgecolors='lightgreen',marker='o')
