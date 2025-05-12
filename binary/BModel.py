@@ -8,7 +8,7 @@ class AttentionPooling(nn.Module):
     def __init__(self, size):
         super(AttentionPooling, self).__init__()
         self.n = size -1
-        self.sigmoid = nn.Softmax()
+        self.softmax = nn.Softmax(dim=0)
 
 
     def forward(self, outs):
@@ -17,9 +17,9 @@ class AttentionPooling(nn.Module):
         d = (outs - outs.mean(dim=0)).pow(2)
         v = d.sum(dim=0) / n
         e = d / (4 * (v + 0.001)) + 0.5
-        proto = torch.sum((outs * self.sigmoid(e)), dim=0)
-
+        proto = torch.sum(outs * self.softmax(e.sum(dim=1)).unsqueeze(1), dim=0)
         return proto
+        
 class MeanPolling(nn.Module):
     def __init__(self):
         super(MeanPolling, self).__init__()
@@ -68,12 +68,9 @@ class ModelP(nn.Module):
         x_e, x_e1 = self.encoder(X, hg)
         x_e1 = self.fc(x_e1)
 
-        # 可学习权重
         z = torch.sigmoid(self.fc1_update(x_e1) + self.fc2_update(x_e))
         r = torch.sigmoid(self.fc1_reset(x_e1) + self.fc2_reset(x_e))
-        # # 重置  保留的局部x_e1
         out = torch.tanh(self.fc1(x_e1) + self.fc2(r * x_e))
-        # # 更新 包iu
         outs = z * out + (1-z) * x_e
 
 
