@@ -8,6 +8,7 @@ class AttentionPooling(nn.Module):
     def __init__(self, size):
         super(AttentionPooling, self).__init__()
         self.n = size -1
+        self.sigmoid = nn.Sigmoid()
         self.softmax = nn.Softmax(dim=0)
 
 
@@ -17,7 +18,7 @@ class AttentionPooling(nn.Module):
         d = (outs - outs.mean(dim=0)).pow(2)
         v = d.sum(dim=0) / n
         e = d / (4 * (v + 0.001)) + 0.5
-        proto = torch.sum(outs * self.softmax(e.sum(dim=1)).unsqueeze(1), dim=0)
+        proto = torch.sum(outs * self.sigmoid(e.sum(dim=1)).unsqueeze(1), dim=0)/ self.sigmoid(e.sum(dim=1)).sum()
         return proto
         
 class MeanPolling(nn.Module):
