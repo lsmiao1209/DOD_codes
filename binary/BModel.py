@@ -4,31 +4,6 @@ from utils import *
 from torch import nn
 from torch.autograd import Function
 
-class AttentionPooling(nn.Module):
-    def __init__(self, size):
-        super(AttentionPooling, self).__init__()
-        self.n = size -1
-        self.sigmoid = nn.Sigmoid()
-        self.softmax = nn.Softmax(dim=0)
-
-
-    def forward(self, outs):
-        # Calculate attention scores
-        n = self.n
-        d = (outs - outs.mean(dim=0)).pow(2)
-        v = d.sum(dim=0) / n
-        e = d / (4 * (v + 0.001)) + 0.5
-        proto = torch.sum(outs * self.sigmoid(e.sum(dim=1)).unsqueeze(1), dim=0)/ self.sigmoid(e.sum(dim=1)).sum()
-        return proto
-        
-class MeanPolling(nn.Module):
-    def __init__(self):
-        super(MeanPolling, self).__init__()
-
-    def forward(self, x):
-        proto = torch.mean(x, dim=0)
-        return proto
-
 class ModelP(nn.Module):
     def __init__(self, input_size, num_features, num_embedding, width, device):
         super(ModelP, self).__init__()
